@@ -7,8 +7,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER   = '<my-dockerhub-username>'      // TODO: set your Docker Hub username
-        NOTIFY_EMAIL     = '<my-email@example.com>'       // TODO: set the notification address
+        DOCKERHUB_USER   = 'akshat09128'      // TODO: set your Docker Hub username
+        NOTIFY_EMAIL     = 'akshat.betala@gmail.com'       // TODO: set the notification address
         IMAGE_NAME       = "${DOCKERHUB_USER}/calculator-api"
         IMAGE_TAG        = "${BUILD_NUMBER}"
         COMPOSE_PROJECT_NAME = 'calculator'
