@@ -22,10 +22,8 @@ pipeline {
     }
 
     triggers {
-        githubPush()                       // GitHub webhook -> /github-webhook/
-        // Fallback when the webhook can't reach Jenkins: poll every 5 minutes
-        // pollSCM('H/5 * * * *')
-    }
+       pollSCM('* * * * *')   // check GitHub every minute (use H/2 * * * * if you prefer)
+   }
 
     stages {
         stage('Checkout') {
