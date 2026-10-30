@@ -1,0 +1,30 @@
+# Build output and VCS
+target/
+.git/
+.gitignore
+.gitattributes
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+
+# Docs, CI and deployment files not needed in the image
+*.md
+docs/
+Jenkinsfile
+docker-compose*.yml
+nginx/
+Dockerfile
+.dockerignore
+
+# Local env / logs
+.env
+.env.*
+logs/
+*.log
