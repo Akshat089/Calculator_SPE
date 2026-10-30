@@ -23,7 +23,8 @@ services:
       - calculator-net
 
   nginx:
-    image: nginx:alpine
+    build: ./nginx
+    image: ${DOCKERHUB_USER:-local}/calculator-nginx:${IMAGE_TAG:-latest}
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
