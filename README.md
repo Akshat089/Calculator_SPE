@@ -144,7 +144,37 @@ git push → GitHub → (webhook) → Jenkins
 
 ## Pipeline architecture
 
-_To be completed together with the Jenkins pipeline._
+```mermaid
+flowchart LR
+    dev[Developer] -- git push --> gh[(GitHub)]
+    gh -- webhook --> jk[Jenkins]
+    jk --> c[Checkout] --> b[Build] --> t[Test + JUnit] --> db[Docker Build] --> p[Push] --> d[Deploy]
+    p --> hub[(Docker Hub)]
+    d --> ng[nginx :80] --> app[calculator-app :8080]
+    jk -. email .-> mail[Success / failure mail]
+```
+
+| Stage        | What it does |
+|--------------|--------------|
+| Checkout     | `checkout scm` — the commit that triggered the build |
+| Build        | `mvn clean package -DskipTests` |
+| Test         | `mvn test`; publishes `target/surefire-reports/*.xml` with the `junit` step; any failure stops the pipeline |
+| Docker Build | builds `<DOCKERHUB_USER>/calculator-api:<BUILD_NUMBER>` and `:latest` |
+| Push         | `docker login` with the `dockerhub-creds` Jenkins credential, pushes both tags |
+| Deploy       | `IMAGE_TAG=<BUILD_NUMBER> docker compose up -d --no-build --remove-orphans`, then polls `/actuator/health` through nginx and fails if it never reports `UP` |
+| post         | emails job name, build number and URL on success / failure |
+
+The pipeline is triggered by a GitHub push webhook (`triggers { githubPush() }`, with a
+commented `pollSCM` fallback). Before the first run, set `DOCKERHUB_USER` and
+`NOTIFY_EMAIL` in the `environment` block of the `Jenkinsfile`.
+
+The `Jenkinsfile` uses `sh` steps and assumes a **Linux** Jenkins (e.g. Jenkins in Docker
+with `/var/run/docker.sock` mounted and the docker CLI, compose plugin and Maven
+installed). On a native Windows Jenkins, replace `sh` with `bat` (and port the Deploy
+health-check loop), or put Git Bash's `sh.exe` on the Jenkins PATH.
+
+- Jenkins installation, plugins, credentials, SMTP and webhook: [docs/JENKINS_SETUP.md](docs/JENKINS_SETUP.md)
+- Architecture, stage descriptions and challenges for the report: [docs/REPORT_NOTES.md](docs/REPORT_NOTES.md)
 
 ## Repository structure
 
@@ -161,6 +191,15 @@ _To be completed together with the Jenkins pipeline._
 │   └── test/java/com/Akshat/calculator/
 │       ├── service/CalculatorServiceTest   # unit tests
 │       └── controller/CalculatorControllerTest # MockMvc integration tests
+├── Dockerfile                              # multi-stage image build
+├── .dockerignore
+├── docker-compose.yml                      # calculator-app + nginx stack
+├── nginx/nginx.conf                        # reverse proxy config
+├── .env.example                            # sample DOCKERHUB_USER / IMAGE_TAG / NGINX_PORT
+├── Jenkinsfile                             # declarative CI/CD pipeline
+├── docs/
+│   ├── JENKINS_SETUP.md                    # Jenkins setup guide
+│   └── REPORT_NOTES.md                     # architecture, stages, challenges
 ├── pom.xml                                 # Maven build
 ├── mvnw, mvnw.cmd, .mvn/                   # Maven wrapper
 └── README.md
