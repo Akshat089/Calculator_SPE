@@ -84,6 +84,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
+                sh '''
+                    docker compose build nginx
+                    docker compose up -d --no-build --remove-orphans
+                    docker compose ps
+                '''
                 // Fixed project name + no container_name in compose + --remove-orphans
                 // means re-running simply rolls the stack forward to this build's image.
                 sh '''
