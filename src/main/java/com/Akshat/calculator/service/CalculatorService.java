@@ -22,6 +22,6 @@ public class CalculatorService {
         if (b == 0) {
             throw new DivisionByZeroException("Division by zero is not allowed");
         }
-        return a / b;
+        return a/ b;
     }
 }
