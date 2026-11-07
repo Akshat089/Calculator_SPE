@@ -21,9 +21,10 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')
     }
 
+    
     triggers {
        pollSCM('* * * * *')   // check GitHub every minute (use H/2 * * * * if you prefer)
-   }
+    }
 
     stages {
         stage('Checkout') {

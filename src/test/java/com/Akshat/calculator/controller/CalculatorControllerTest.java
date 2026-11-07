@@ -48,6 +48,7 @@ class CalculatorControllerTest {
 
     @Test
     void divideByZeroReturnsBadRequest() throws Exception {
+        //just a comment to test
         mockMvc.perform(get("/api/v1/divide").param("a", "10").param("b", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
